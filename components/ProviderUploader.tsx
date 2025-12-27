@@ -82,7 +82,7 @@ export const ProviderUploader: React.FC<ProviderUploaderProps> = ({ onUpload, ex
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. apple, fitbit"
-                className="w-full h-10 px-3 bg-white border border-slate-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                className="w-full h-8 px-3 bg-white border border-slate-300 rounded-md text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
               />
             </div>
             <div className="flex-1 w-full">
@@ -95,19 +95,31 @@ export const ProviderUploader: React.FC<ProviderUploaderProps> = ({ onUpload, ex
                   type="file"
                   accept=".json"
                   onChange={handleFileChange}
-                  className="block w-full text-sm text-slate-500
-                    file:mr-4 file:py-2 file:px-4
+                  className="block w-full text-xs text-slate-500
+                    file:mr-4 file:py-0 file:px-3 file:h-8
                     file:rounded-md file:border-0
-                    file:text-sm file:font-semibold
+                    file:text-xs file:font-semibold
                     file:bg-indigo-50 file:text-indigo-700
                     hover:file:bg-indigo-100
-                    bg-white border border-slate-300 rounded-md h-10 cursor-pointer
+                    file:flex file:items-center
+                    bg-white border border-slate-300 rounded-md h-8 cursor-pointer
+                    leading-8
                   "
                 />
+                {!file && (
+                  <div className="absolute left-[100px] top-0 h-8 flex items-center pointer-events-none text-xs text-slate-400 pl-1">
+                    Click here to upload a JSON schema file
+                  </div>
+                )}
               </div>
+              {file && (
+                <p className="mt-1 text-xs text-slate-500">
+                  Selected: {file.name}
+                </p>
+              )}
             </div>
             <div className="pb-[2px]">
-                <Button type="submit" disabled={!file || !name}>
+                <Button type="submit" size="sm" disabled={!file || !name}>
                     Add Provider
                 </Button>
             </div>

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Dataset, Provider, CanonicalField } from './types';
 import { processUploadedJSON } from './utils/jsonUtils';
-import { downloadCSV } from './utils/exportUtils';
+import { downloadJSON, loadJSON } from './utils/exportUtils';
 import { ProviderUploader } from './components/ProviderUploader';
 import { MappingTable } from './components/MappingTable';
 import { UnmappedPanel } from './components/UnmappedPanel';
 import { Button } from './components/ui/Button';
-import { FileDown, Database, Trash, Save, Play } from 'lucide-react';
+import { FileDown, FileUp, Database, Trash, Save, Play } from 'lucide-react';
 import suuntoData from './samples/sleep/suunto.json';
 import garminData from './samples/sleep/garmin.json';
 import appleData from './samples/sleep/apple.json';
@@ -163,6 +163,30 @@ const App: React.FC = () => {
     });
   };
 
+  const handleImportJSON = async () => {
+    if (dataset.providers.length > 0 || dataset.canonicalFields.length > 0) {
+      if (!confirm("This will replace your current data with the imported file. Continue?")) {
+        return;
+      }
+    }
+
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      try {
+        const importedDataset = await loadJSON(file);
+        setDataset(importedDataset);
+      } catch (error) {
+        alert(`Failed to load file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    };
+    input.click();
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
       {/* Header */}
@@ -195,9 +219,13 @@ const App: React.FC = () => {
               Clear Session
             </Button>
             <div className="h-6 w-px bg-slate-200 mx-1"></div>
-            <Button onClick={() => downloadCSV(dataset)} disabled={dataset.canonicalFields.length === 0}>
+            <Button variant="secondary" size="sm" onClick={handleImportJSON}>
+              <FileUp className="w-4 h-4 mr-2" />
+              Import
+            </Button>
+            <Button size="sm" onClick={() => downloadJSON(dataset)} disabled={dataset.providers.length === 0}>
               <FileDown className="w-4 h-4 mr-2" />
-              Export CSV
+              Export
             </Button>
           </div>
         </div>
