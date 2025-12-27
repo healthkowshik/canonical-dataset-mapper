@@ -6,7 +6,10 @@ import { ProviderUploader } from './components/ProviderUploader';
 import { MappingTable } from './components/MappingTable';
 import { UnmappedPanel } from './components/UnmappedPanel';
 import { Button } from './components/ui/Button';
-import { FileDown, Database, Trash, Save } from 'lucide-react';
+import { FileDown, Database, Trash, Save, Play } from 'lucide-react';
+import suuntoData from './samples/sleep/suunto.json';
+import garminData from './samples/sleep/garmin.json';
+import appleData from './samples/sleep/apple.json';
 
 const STORAGE_KEY = 'canonical-mapper-v1';
 
@@ -130,6 +133,36 @@ const App: React.FC = () => {
     }
   };
 
+  const handleLoadDemo = () => {
+    if (dataset.providers.length > 0 || dataset.canonicalFields.length > 0) {
+      if (!confirm("This will replace your current data with demo data. Continue?")) {
+        return;
+      }
+    }
+
+    const sampleFiles = [
+      { name: 'suunto', data: suuntoData },
+      { name: 'garmin', data: garminData },
+      { name: 'apple', data: appleData }
+    ];
+
+    const providers: Provider[] = sampleFiles.map(({ name, data }) => {
+      const { sample, keys } = processUploadedJSON(data);
+      return {
+        id: crypto.randomUUID(),
+        name,
+        flatKeys: keys,
+        sampleData: sample
+      };
+    });
+
+    setDataset({
+      name: 'Sleep Data Mapping',
+      providers,
+      canonicalFields: []
+    });
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
       {/* Header */}
@@ -152,6 +185,11 @@ const App: React.FC = () => {
           </div>
           
           <div className="flex items-center gap-3">
+            <Button variant="secondary" size="sm" onClick={handleLoadDemo}>
+              <Play className="w-4 h-4 mr-2" />
+              Demo
+            </Button>
+            <div className="h-6 w-px bg-slate-200 mx-1"></div>
             <Button variant="ghost" size="sm" onClick={handleResetSession} className="text-red-500 hover:text-red-700 hover:bg-red-50">
               <Trash className="w-4 h-4 mr-2" />
               Clear Session

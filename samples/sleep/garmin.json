@@ -1,0 +1,50 @@
+{
+    "sleepStartTimestampGMT": 1705363200,
+    "sleepEndTimestampGMT": 1705384800,
+    "sleepStartTimestampLocal": 1705376800,
+    "sleepEndTimestampLocal": 1705398400,
+    "sleepTimeSeconds": 21600,
+    "timeInBedSeconds": 22800,
+    "sleepQualityScore": 85,
+    "deepSleepSeconds": 7200,
+    "lightSleepSeconds": 10800,
+    "remSleepSeconds": 3600,
+    "awakeSleepSeconds": 1200,
+    "nap": false,
+    "averageHeartRate": 55,
+    "minimumHeartRate": 48,
+    "maximumHeartRate": 62,
+    "averageRespirationValue": 14.5,
+    "lowestRespirationValue": 12.0,
+    "highestRespirationValue": 16.0,
+    "averageSpO2": 98,
+    "lowestSpO2": 96,
+    "highestSpO2": 99,
+    "sleepActivityLevels": [
+        {
+            "startTimeGMT": 1705363200,
+            "endTimeGMT": 1705370400,
+            "activityLevel": "deep"
+        },
+        {
+            "startTimeGMT": 1705370400,
+            "endTimeGMT": 1705380000,
+            "activityLevel": "light"
+        },
+        {
+            "startTimeGMT": 1705380000,
+            "endTimeGMT": 1705383600,
+            "activityLevel": "rem"
+        },
+        {
+            "startTimeGMT": 1705383600,
+            "endTimeGMT": 1705384800,
+            "activityLevel": "awake"
+        }
+    ],
+    "wellnessSleepDataDTO": {
+        "sleepWindowConfirmed": true,
+        "sleepWindowConfirmationType": "auto_confirmed_final"
+    }
+}
+

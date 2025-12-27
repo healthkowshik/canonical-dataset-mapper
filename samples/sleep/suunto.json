@@ -1,0 +1,21 @@
+{
+    "timestamp": "2024-01-15T22:00:00.000Z",
+    "entryData": {
+        "SleepId": "suunto-sleep-123456",
+        "BedtimeStart": "2024-01-15T22:00:00.000Z",
+        "BedtimeEnd": "2024-01-16T06:30:00.000Z",
+        "Duration": 30600,
+        "DeepSleepDuration": 7200,
+        "LightSleepDuration": 14400,
+        "REMSleepDuration": 3600,
+        "SleepQualityScore": 85.5,
+        "IsNap": false,
+        "HRAvg": 55,
+        "HRMin": 48,
+        "HRMax": 62,
+        "AvgHRV": 45.2,
+        "MaxSpo2": 98,
+        "Feeling": "good"
+    }
+}
+
