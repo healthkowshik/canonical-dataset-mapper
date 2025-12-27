@@ -1,13 +1,14 @@
 import React, { useMemo, useState } from 'react';
 import { Dataset, Provider } from '../types';
-import { ChevronDown, ChevronUp, Copy, Check, Search } from 'lucide-react';
+import { ChevronDown, ChevronUp, Copy, Check, Search, X, List } from 'lucide-react';
 
 interface UnmappedPanelProps {
   dataset: Dataset;
   onCopyAttribute: (attr: string) => void;
+  onDeleteProvider: (providerId: string) => void;
 }
 
-export const UnmappedPanel: React.FC<UnmappedPanelProps> = ({ dataset, onCopyAttribute }) => {
+export const UnmappedPanel: React.FC<UnmappedPanelProps> = ({ dataset, onCopyAttribute, onDeleteProvider }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -46,12 +47,13 @@ export const UnmappedPanel: React.FC<UnmappedPanelProps> = ({ dataset, onCopyAtt
   };
 
   return (
-    <div className={`mt-6 bg-white border border-slate-200 rounded-lg shadow-sm flex flex-col transition-all duration-300 ${isExpanded ? 'h-96' : 'h-12'}`}>
+    <div className="mb-6 bg-white border border-slate-200 rounded-lg shadow-sm flex flex-col overflow-hidden">
       <div 
-        className="px-4 py-3 bg-slate-50 border-b border-slate-200 flex justify-between items-center cursor-pointer hover:bg-slate-100 transition-colors rounded-t-lg"
+        className={`px-4 py-3 bg-slate-50 ${isExpanded ? 'border-b border-slate-200' : ''} flex justify-between items-center cursor-pointer hover:bg-slate-100 transition-colors`}
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <h3 className="font-semibold text-sm text-slate-800 flex items-center gap-2">
+            <List className="w-4 h-4" />
             Unmapped Attributes
             <span className="bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full text-xs font-normal">
                 {totalUnmapped} total
@@ -75,12 +77,24 @@ export const UnmappedPanel: React.FC<UnmappedPanelProps> = ({ dataset, onCopyAtt
       </div>
 
       {isExpanded && (
-        <div className="flex-1 overflow-hidden flex divide-x divide-slate-200">
+        <div className="h-[400px] overflow-hidden flex divide-x divide-slate-200">
           {unmappedData.map(({ provider, unmapped }) => (
             <div key={provider.id} className="flex-1 flex flex-col min-w-[250px]">
-              <div className="px-3 py-2 bg-slate-50/50 border-b border-slate-100 text-xs font-medium text-slate-700 flex justify-between">
+              <div className="px-3 py-2 bg-slate-50/50 border-b border-slate-100 text-xs font-medium text-slate-700 flex justify-between items-center group/header">
                 <span>{provider.name}</span>
-                <span className="text-slate-400">{unmapped.length}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-400">{unmapped.length}</span>
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteProvider(provider.id);
+                    }}
+                    className="text-slate-400 hover:text-red-600 opacity-0 group-hover/header:opacity-100 transition-opacity p-1 rounded hover:bg-slate-200"
+                    title="Remove Provider"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
               <div className="flex-1 overflow-y-auto p-2">
                 {unmapped.length === 0 ? (

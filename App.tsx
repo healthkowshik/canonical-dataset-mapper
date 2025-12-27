@@ -12,7 +12,7 @@ const STORAGE_KEY = 'canonical-mapper-v1';
 
 const App: React.FC = () => {
   const [dataset, setDataset] = useState<Dataset>({
-    name: 'New Dataset',
+    name: '',
     providers: [],
     canonicalFields: []
   });
@@ -123,7 +123,7 @@ const App: React.FC = () => {
   const handleResetSession = () => {
     if (confirm("Are you sure you want to clear the current session? This cannot be undone.")) {
       setDataset({
-        name: 'New Dataset',
+        name: '',
         providers: [],
         canonicalFields: []
       });
@@ -173,6 +173,15 @@ const App: React.FC = () => {
             existingNames={dataset.providers.map(p => p.name)} 
         />
 
+        <UnmappedPanel 
+            dataset={dataset}
+            onCopyAttribute={(attr) => {
+                navigator.clipboard.writeText(attr);
+                // Could add toast notification here
+            }}
+            onDeleteProvider={handleDeleteProvider}
+        />
+
         <div className="flex-1 flex flex-col min-h-[500px]">
             <MappingTable
                 dataset={dataset}
@@ -181,14 +190,6 @@ const App: React.FC = () => {
                 onDeleteCanonical={handleDeleteCanonical}
                 onUpdateMapping={handleUpdateMapping}
                 onDeleteProvider={handleDeleteProvider}
-            />
-            
-            <UnmappedPanel 
-                dataset={dataset}
-                onCopyAttribute={(attr) => {
-                    navigator.clipboard.writeText(attr);
-                    // Could add toast notification here
-                }}
             />
         </div>
       </main>

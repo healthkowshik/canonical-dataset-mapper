@@ -4,8 +4,8 @@ export const downloadCSV = (dataset: Dataset) => {
   if (dataset.canonicalFields.length === 0) return;
 
   // 1. Build Header Row
-  // "Canonical Attribute", "Provider 1", "Provider 2"...
-  const headers = ['Canonical Attribute', ...dataset.providers.map(p => p.name)];
+  // "Canonical", "Provider 1", "Provider 2"...
+  const headers = ['Canonical', ...dataset.providers.map(p => p.name)];
 
   // 2. Build Data Rows
   const rows = dataset.canonicalFields.map(field => {

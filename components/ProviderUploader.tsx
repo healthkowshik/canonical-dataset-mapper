@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Button } from './ui/Button';
-import { Upload, FileJson, AlertCircle } from 'lucide-react';
+import { Upload, FileJson, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface ProviderUploaderProps {
   onUpload: (name: string, data: any) => void;
@@ -11,6 +11,7 @@ export const ProviderUploader: React.FC<ProviderUploaderProps> = ({ onUpload, ex
   const [name, setName] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isExpanded, setIsExpanded] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,55 +58,66 @@ export const ProviderUploader: React.FC<ProviderUploaderProps> = ({ onUpload, ex
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm mb-6">
-      <h3 className="text-sm font-semibold text-slate-900 mb-3 flex items-center gap-2">
-        <Upload className="w-4 h-4" />
-        Add Provider
-      </h3>
-      <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-4 items-end">
-        <div className="flex-1 w-full">
-          <label className="block text-xs font-medium text-slate-600 mb-1">
-            Provider Name
-          </label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. apple, fitbit"
-            className="w-full h-10 px-3 bg-white border border-slate-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-          />
-        </div>
-        <div className="flex-1 w-full">
-          <label className="block text-xs font-medium text-slate-600 mb-1">
-            JSON Schema File
-          </label>
-          <div className="relative">
-             <input
-              ref={fileInputRef}
-              type="file"
-              accept=".json"
-              onChange={handleFileChange}
-              className="block w-full text-sm text-slate-500
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-md file:border-0
-                file:text-sm file:font-semibold
-                file:bg-indigo-50 file:text-indigo-700
-                hover:file:bg-indigo-100
-                bg-white border border-slate-300 rounded-md h-10 cursor-pointer
-              "
-            />
-          </div>
-        </div>
-        <div className="pb-[2px]">
-            <Button type="submit" disabled={!file || !name}>
-                Add Provider
-            </Button>
-        </div>
-      </form>
-      {error && (
-        <div className="mt-2 text-red-600 text-xs flex items-center gap-1">
-          <AlertCircle className="w-3 h-3" />
-          {error}
+    <div className="bg-white rounded-lg border border-slate-200 shadow-sm mb-6 flex flex-col overflow-hidden">
+      <div 
+        className="px-4 py-3 bg-slate-50 border-b border-slate-200 flex justify-between items-center cursor-pointer hover:bg-slate-100 transition-colors"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <h3 className="text-sm font-semibold text-slate-800 flex items-center gap-2">
+          <Upload className="w-4 h-4" />
+          Add Provider
+        </h3>
+        {isExpanded ? <ChevronDown className="w-4 h-4 text-slate-500" /> : <ChevronUp className="w-4 h-4 text-slate-500" />}
+      </div>
+      
+      {isExpanded && (
+        <div className="p-4">
+          <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-4 items-end">
+            <div className="flex-1 w-full">
+              <label className="block text-xs font-medium text-slate-600 mb-1">
+                Provider Name
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g. apple, fitbit"
+                className="w-full h-10 px-3 bg-white border border-slate-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+              />
+            </div>
+            <div className="flex-1 w-full">
+              <label className="block text-xs font-medium text-slate-600 mb-1">
+                JSON Schema File
+              </label>
+              <div className="relative">
+                 <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".json"
+                  onChange={handleFileChange}
+                  className="block w-full text-sm text-slate-500
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-md file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-indigo-50 file:text-indigo-700
+                    hover:file:bg-indigo-100
+                    bg-white border border-slate-300 rounded-md h-10 cursor-pointer
+                  "
+                />
+              </div>
+            </div>
+            <div className="pb-[2px]">
+                <Button type="submit" disabled={!file || !name}>
+                    Add Provider
+                </Button>
+            </div>
+          </form>
+          {error && (
+            <div className="mt-2 text-red-600 text-xs flex items-center gap-1">
+              <AlertCircle className="w-3 h-3" />
+              {error}
+            </div>
+          )}
         </div>
       )}
     </div>
