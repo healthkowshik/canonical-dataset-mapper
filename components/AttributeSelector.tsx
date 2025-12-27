@@ -40,7 +40,7 @@ export const AttributeSelector: React.FC<AttributeSelectorProps> = ({ options, v
             setSearch('');
           }}
           className={`
-            w-full px-2 py-1.5 text-xs rounded border cursor-pointer flex justify-between items-center group shadow-sm
+            w-full px-2 py-1.5 text-xs rounded border cursor-pointer flex justify-between items-center group shadow-sm min-h-[28px]
             ${value 
               ? 'bg-indigo-50 border-indigo-200 text-indigo-900' 
               : 'bg-white border-slate-300 text-slate-700 hover:border-indigo-300'
@@ -48,14 +48,14 @@ export const AttributeSelector: React.FC<AttributeSelectorProps> = ({ options, v
             transition-all
           `}
         >
-          <span className="truncate font-mono" title={value}>{displayValue}</span>
+          <span className="truncate font-mono flex-1" title={value}>{displayValue}</span>
           {value && (
             <button 
               onClick={(e) => {
                 e.stopPropagation();
                 onChange(undefined);
               }}
-              className="p-0.5 hover:bg-indigo-200 rounded text-indigo-400 hover:text-indigo-700 opacity-0 group-hover:opacity-100 transition-opacity"
+              className="ml-1 p-0.5 hover:bg-indigo-200 rounded text-indigo-400 hover:text-indigo-700 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
             >
               <X className="w-3 h-3" />
             </button>
