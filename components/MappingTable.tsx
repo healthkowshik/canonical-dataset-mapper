@@ -52,19 +52,21 @@ export const MappingTable: React.FC<MappingTableProps> = ({
               <thead className="sticky top-0 z-10 shadow-sm">
                 <tr>
                   <th className="p-3 text-left font-semibold text-slate-800 border-b border-slate-200 min-w-[200px] w-1/4 bg-white">
-                    <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center justify-between gap-3">
                       <span>Canonical</span>
-                      <button
+                      <Button
                         onClick={(e) => {
                           e.stopPropagation();
                           onAddCanonical();
                         }}
-                        className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded border border-indigo-200 transition-colors"
+                        size="sm"
+                        variant="primary"
+                        className="shadow-sm"
                         title="Add Canonical Field"
                       >
-                        <Plus className="w-3 h-3" />
+                        <Plus className="w-3.5 h-3.5 mr-1.5" />
                         Add Field
-                      </button>
+                      </Button>
                     </div>
                   </th>
               {dataset.providers.map(provider => (
