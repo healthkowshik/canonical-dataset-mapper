@@ -1,0 +1,4 @@
+{
+  "name": "Canonical Dataset Mapper",
+  "description": "A browser-based tool for data engineers to map disparate provider JSON schemas to a single canonical dataset definition."
+}
