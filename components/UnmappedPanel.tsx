@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Dataset, Provider } from '../types';
-import { ChevronDown, ChevronUp, Copy, Check, Search, X, List } from 'lucide-react';
+import { ChevronDown, ChevronUp, Copy, Check, Search, X, List, Database } from 'lucide-react';
 
 interface UnmappedPanelProps {
   dataset: Dataset;
@@ -11,6 +11,15 @@ interface UnmappedPanelProps {
 export const UnmappedPanel: React.FC<UnmappedPanelProps> = ({ dataset, onCopyAttribute, onDeleteProvider }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+
+  const getMappedKeyCount = (providerId: string) => {
+    const keys = new Set<string>();
+    dataset.canonicalFields.forEach(f => {
+        const k = f.mappings[providerId];
+        if (k) keys.add(k);
+    });
+    return keys.size;
+  };
 
   const unmappedData = useMemo(() => {
     return dataset.providers.map(provider => {
@@ -80,8 +89,20 @@ export const UnmappedPanel: React.FC<UnmappedPanelProps> = ({ dataset, onCopyAtt
         <div className="h-[400px] overflow-hidden flex divide-x divide-slate-200">
           {unmappedData.map(({ provider, unmapped }) => (
             <div key={provider.id} className="flex-1 flex flex-col min-w-[250px]">
-              <div className="px-3 py-2 bg-slate-50/50 border-b border-slate-100 text-xs font-medium text-slate-700 flex justify-between items-center group/header">
-                <span>{provider.name}</span>
+              <div className="px-3 py-2 bg-slate-50/50 border-b border-slate-100 text-xs font-medium text-slate-700 flex justify-between items-center group/header relative">
+                {/* Top visual accent for providers */}
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-indigo-500"></div>
+                
+                <div className="flex flex-col gap-1 pt-0.5">
+                  <span className="flex items-center gap-1.5">
+                    <Database className="w-3 h-3 text-indigo-500" />
+                    {provider.name}
+                  </span>
+                  <span className="text-[10px] font-normal text-slate-500 flex gap-2">
+                    <span>{provider.flatKeys.length} keys</span>
+                    <span className="text-indigo-600 font-medium">{getMappedKeyCount(provider.id)} mapped</span>
+                  </span>
+                </div>
                 <div className="flex items-center gap-2">
                   <span className="text-slate-400">{unmapped.length}</span>
                   <button 

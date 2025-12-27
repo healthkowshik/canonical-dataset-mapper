@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Dataset, CanonicalField, Provider } from '../types';
 import { Button } from './ui/Button';
 import { AttributeSelector } from './AttributeSelector';
-import { Plus, Trash2, X, Database, ChevronDown, ChevronUp, Link2 } from 'lucide-react';
+import { Plus, Trash2, X, ChevronDown, ChevronUp, Link2 } from 'lucide-react';
 
 interface MappingTableProps {
   dataset: Dataset;
@@ -77,17 +77,8 @@ export const MappingTable: React.FC<MappingTableProps> = ({
                   {/* Top visual accent for providers */}
                   <div className="absolute top-0 left-0 right-0 h-[2px] bg-indigo-500"></div>
                   
-                  <div className="flex justify-between items-start">
-                      <div className="flex flex-col gap-1">
-                        <span className="flex items-center gap-1.5">
-                            <Database className="w-3 h-3 text-indigo-500" />
-                            {provider.name}
-                        </span>
-                        <span className="text-[10px] font-normal text-slate-500 flex gap-2">
-                            <span>{provider.flatKeys.length} keys</span>
-                            <span className="text-indigo-600 font-medium">{getMappedKeyCount(provider.id)} mapped</span>
-                        </span>
-                      </div>
+                  <div className="flex justify-between items-center">
+                      <span>{provider.name}</span>
                       <button 
                         onClick={() => onDeleteProvider(provider.id)}
                         className="text-slate-400 hover:text-red-600 opacity-0 group-hover/header:opacity-100 transition-opacity p-1 rounded hover:bg-slate-200"
