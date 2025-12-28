@@ -6,7 +6,7 @@ import { ProviderUploader } from './components/ProviderUploader';
 import { MappingTable } from './components/MappingTable';
 import { UnmappedPanel } from './components/UnmappedPanel';
 import { Button } from './components/ui/Button';
-import { FileDown, FileUp, Database, Trash, Save, Play } from 'lucide-react';
+import { FileDown, FileUp, Database, Trash, Save, Play, Check } from 'lucide-react';
 import suuntoData from './samples/sleep/suunto.json';
 import garminData from './samples/sleep/garmin.json';
 import appleData from './samples/sleep/apple.json';
@@ -19,6 +19,7 @@ const App: React.FC = () => {
     providers: [],
     canonicalFields: []
   });
+  const [toast, setToast] = useState<{ message: string; visible: boolean }>({ message: '', visible: false });
 
   // Load from local storage on mount
   useEffect(() => {
@@ -32,9 +33,13 @@ const App: React.FC = () => {
     }
   }, []);
 
-  // Save to local storage on change
+  // Save to local storage on change (debounced)
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(dataset));
+    const timeoutId = setTimeout(() => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(dataset));
+    }, 500); // Debounce by 500ms
+
+    return () => clearTimeout(timeoutId);
   }, [dataset]);
 
   const handleDatasetNameChange = (name: string) => {
@@ -173,18 +178,34 @@ const App: React.FC = () => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
-    input.onchange = async (e) => {
+    
+    const handleFileChange = async (e: Event) => {
       const file = (e.target as HTMLInputElement).files?.[0];
-      if (!file) return;
+      if (!file) {
+        input.remove();
+        return;
+      }
 
       try {
         const importedDataset = await loadJSON(file);
         setDataset(importedDataset);
+        showToast('Dataset imported successfully');
       } catch (error) {
         alert(`Failed to load file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      } finally {
+        input.remove();
       }
     };
+
+    input.addEventListener('change', handleFileChange);
     input.click();
+  };
+
+  const showToast = (message: string) => {
+    setToast({ message, visible: true });
+    setTimeout(() => {
+      setToast(prev => ({ ...prev, visible: false }));
+    }, 2000);
   };
 
   return (
@@ -243,7 +264,7 @@ const App: React.FC = () => {
             dataset={dataset}
             onCopyAttribute={(attr) => {
                 navigator.clipboard.writeText(attr);
-                // Could add toast notification here
+                showToast(`Copied "${attr}" to clipboard`);
             }}
             onDeleteProvider={handleDeleteProvider}
         />
@@ -259,6 +280,14 @@ const App: React.FC = () => {
             />
         </div>
       </main>
+
+      {/* Toast Notification */}
+      {toast.visible && (
+        <div className="fixed bottom-4 right-4 bg-slate-900 text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 z-50 transition-all duration-300 ease-in-out">
+          <Check className="w-4 h-4" />
+          <span className="text-sm">{toast.message}</span>
+        </div>
+      )}
     </div>
   );
 };
