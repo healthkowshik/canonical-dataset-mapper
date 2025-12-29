@@ -6,7 +6,7 @@ import { ProviderUploader } from './components/ProviderUploader';
 import { MappingTable } from './components/MappingTable';
 import { UnmappedPanel } from './components/UnmappedPanel';
 import { Button } from './components/ui/Button';
-import { FileDown, FileUp, Database, Trash, Save, Play, Check } from 'lucide-react';
+import { FileDown, FileUp, Database, Trash, Play, Check, X } from 'lucide-react';
 import suuntoData from './samples/sleep/suunto.json';
 import garminData from './samples/sleep/garmin.json';
 import appleData from './samples/sleep/apple.json';
@@ -19,7 +19,10 @@ const App: React.FC = () => {
     providers: [],
     canonicalFields: []
   });
-  const [toast, setToast] = useState<{ message: string; visible: boolean }>({ message: '', visible: false });
+  const [toast, setToast] = useState<{ message: string; visible: boolean; type?: 'success' | 'error' }>({ message: '', visible: false });
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [showImportConfirm, setShowImportConfirm] = useState(false);
+  const [showExportConfirm, setShowExportConfirm] = useState(false);
 
   // Load from local storage on mount
   useEffect(() => {
@@ -129,13 +132,17 @@ const App: React.FC = () => {
   };
 
   const handleResetSession = () => {
-    if (confirm("Are you sure you want to clear the current session? This cannot be undone.")) {
-      setDataset({
-        name: '',
-        providers: [],
-        canonicalFields: []
-      });
-    }
+    setShowClearConfirm(true);
+  };
+
+  const confirmResetSession = () => {
+    setDataset({
+      name: '',
+      providers: [],
+      canonicalFields: []
+    });
+    setShowClearConfirm(false);
+    showToast('Session cleared successfully');
   };
 
   const handleLoadDemo = () => {
@@ -166,15 +173,22 @@ const App: React.FC = () => {
       providers,
       canonicalFields: []
     });
+    showToast('Demo data loaded successfully');
   };
 
-  const handleImportJSON = async () => {
+  const handleImportJSON = () => {
     if (dataset.providers.length > 0 || dataset.canonicalFields.length > 0) {
-      if (!confirm("This will replace your current data with the imported file. Continue?")) {
-        return;
-      }
+      setShowImportConfirm(true);
+      return;
     }
 
+    // No existing data, proceed directly to file selection
+    proceedWithImport();
+  };
+
+  const proceedWithImport = () => {
+    setShowImportConfirm(false);
+    
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
@@ -191,7 +205,7 @@ const App: React.FC = () => {
         setDataset(importedDataset);
         showToast('Dataset imported successfully');
       } catch (error) {
-        alert(`Failed to load file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        showToast(`Failed to load file: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
       } finally {
         input.remove();
       }
@@ -201,11 +215,25 @@ const App: React.FC = () => {
     input.click();
   };
 
-  const showToast = (message: string) => {
-    setToast({ message, visible: true });
+  const handleExportJSON = () => {
+    if (dataset.providers.length === 0) {
+      showToast('No data to export', 'error');
+      return;
+    }
+    setShowExportConfirm(true);
+  };
+
+  const proceedWithExport = () => {
+    setShowExportConfirm(false);
+    downloadJSON(dataset);
+    showToast('Dataset exported successfully');
+  };
+
+  const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+    setToast({ message, visible: true, type });
     setTimeout(() => {
       setToast(prev => ({ ...prev, visible: false }));
-    }, 2000);
+    }, 3000);
   };
 
   return (
@@ -244,7 +272,7 @@ const App: React.FC = () => {
               <FileUp className="w-4 h-4 mr-2" />
               Import
             </Button>
-            <Button size="sm" onClick={() => downloadJSON(dataset)} disabled={dataset.providers.length === 0}>
+            <Button size="sm" onClick={handleExportJSON} disabled={dataset.providers.length === 0}>
               <FileDown className="w-4 h-4 mr-2" />
               Export
             </Button>
@@ -283,9 +311,77 @@ const App: React.FC = () => {
 
       {/* Toast Notification */}
       {toast.visible && (
-        <div className="fixed bottom-4 right-4 bg-slate-900 text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 z-50 transition-all duration-300 ease-in-out">
-          <Check className="w-4 h-4" />
+        <div className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 z-50 transition-all duration-300 ease-in-out ${
+          toast.type === 'error' 
+            ? 'bg-red-600 text-white' 
+            : 'bg-slate-900 text-white'
+        }`}>
+          {toast.type === 'error' ? (
+            <X className="w-4 h-4" />
+          ) : (
+            <Check className="w-4 h-4" />
+          )}
           <span className="text-sm">{toast.message}</span>
+        </div>
+      )}
+
+      {/* Clear Session Confirmation Dialog */}
+      {showClearConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowClearConfirm(false)}>
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">Clear Session</h3>
+            <p className="text-slate-600 mb-6">
+              Are you sure you want to clear the current session? This cannot be undone.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <Button variant="secondary" size="sm" onClick={() => setShowClearConfirm(false)}>
+                Cancel
+              </Button>
+              <Button size="sm" onClick={confirmResetSession} className="bg-red-600 hover:bg-red-700 text-white">
+                Clear Session
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Import Confirmation Dialog */}
+      {showImportConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowImportConfirm(false)}>
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">Import Dataset</h3>
+            <p className="text-slate-600 mb-6">
+              This will replace your current data with the imported file. Continue?
+            </p>
+            <div className="flex gap-3 justify-end">
+              <Button variant="secondary" size="sm" onClick={() => setShowImportConfirm(false)}>
+                Cancel
+              </Button>
+              <Button size="sm" onClick={proceedWithImport}>
+                Import
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Export Confirmation Dialog */}
+      {showExportConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowExportConfirm(false)}>
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">Export Dataset</h3>
+            <p className="text-slate-600 mb-6">
+              This will download your dataset as a JSON file. Continue?
+            </p>
+            <div className="flex gap-3 justify-end">
+              <Button variant="secondary" size="sm" onClick={() => setShowExportConfirm(false)}>
+                Cancel
+              </Button>
+              <Button size="sm" onClick={proceedWithExport}>
+                Export
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </div>
